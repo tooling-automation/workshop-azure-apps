@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azure SWA Example</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <h1>Welcome to the Azure Web App Workshop!</h1>
+  <p>Click the button below to fetch data from the Static Web App backend.</p>
+  <button id="fetch-button">Get Fun Fact from Function App</button>
+  <p id="api-response"></p>
+
+  <button id="fetch-button-wa">Get Fun Fact from Web App</button>
+  <p id="response-wa"></p>
+</div>
+<script src="script.js"></script>
+</body>
+<script>
+window.appConfig = {
+  apiBaseUrl: '###API_BASE_URL###'
+}
+</script>
+</html>
