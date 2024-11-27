@@ -12,7 +12,7 @@ Deze kan je hier downloaden: https://wslimage.blob.core.windows.net/image/wsl2-d
 Pak de image uit en importeer deze in WSL met het volgende commando:
 
 ```powershell
-cd C:\Users\<jouw-gebruikersnaam>\Downloads\wsl2-dev-image
+cd %USERPROFILE%\Downloads\wsl2-dev-image
 wsl --import workshop-azure-app . .\wsl2-dev-image.tar
 ```
 
@@ -21,8 +21,8 @@ Open een terminal sessie in de workshop-azure-app WSL image.
 Clone de GitHub repository:
 
 ````bash
-git clone git@github.com:tooling-automation/workshop-azure-apps.git
-cd az-apps-workshop
+git clone https://github.com/tooling-automation/workshop-azure-apps.git
+cd workshop-azure-apps
 ````
 
 ```bash
@@ -36,7 +36,7 @@ Open een nieuwe terminal en ga naar de functionapp folder.
 
 Initialiseer een function app met de volgende commando's:
 ```bash
-cd ~/az-apps-workshop/functionapp
+cd ~/workshop-azure-apps/functionapp
 func init --javascript 
 ```
 
@@ -74,7 +74,7 @@ Open een nieuwe terminal en ga naar de staticwebapp folder.
 Zorg dat je in de root van de staticwebapp folder zit en voer de volgende commando's uit:
 
 ```bash
-cd ~/az-apps-workshop/staticwebapp
+cd ~/workshop-azure-apps/staticwebapp
 ```
 
 Voor het lokaal draaien van de static web app geef je de URL van de function app mee.
@@ -97,7 +97,7 @@ Open een nieuwe terminal en ga naar de webapp folder.
 Run de web app lokaal:
 
 ```bash
-cd ~/az-apps-workshop/webapp
+cd ~/workshop-azure-apps/webapp
 npm install
 node app.js
 ```
@@ -177,7 +177,7 @@ Definieer eerst een aantal environment variabelen zodat je deze kan hergebruiken
 Open een nieuwe terminal en voer de volgende commando's uit:
 
 ```bash
-az login
+azctx login
 
 export RUISNAAM=<jouw-ruisnaam>
 export RESOURCE_GROUP_NAME=rg-workshop-$RUISNAAM
@@ -225,7 +225,7 @@ Ga in je browser naar de url die je hebt opgehaald en verifieer dat de static we
 Deploy de static web app naar Azure:
 
 ```bash
-cd ~/az-apps-workshop/staticwebapp
+cd ~/workshop-azure-apps/staticwebapp
 swa deploy ./src --env production --app-name $STATIC_WEB_APP_NAME
 ```
 
@@ -238,7 +238,7 @@ az functionapp create --resource-group $RESOURCE_GROUP_NAME --consumption-plan-l
 Deploy de function app naar Azure:
 
 ```bash
-cd ~/az-apps-workshop/functionapp
+cd ~/workshop-azure-apps/functionapp
 func azure functionapp publish $FUNCTION_APP_NAME
 ```
 
@@ -251,7 +251,7 @@ Verifieer dat de static web app de function app aanroept door op de knop "Get Fu
 Deploy de web app naar Azure met de volgende commando's:
 
 ```bash
-cd ~/az-apps-workshop/webapp 
+cd ~/workshop-azure-apps/webapp 
 az webapp up --sku F1 --name $WEB_APP_NAME --location westeurope --resource-group $RESOURCE_GROUP_NAME
 ```
 
