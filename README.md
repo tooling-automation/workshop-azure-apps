@@ -5,6 +5,27 @@ Het doel van deze workshop is om een web app, function app en static web app te 
 De web app zal een fun fact ophalen van de function app en deze tonen.
 De static web app zal de function app aanroepen en de fun fact tonen.
 
+We hebben voor deze workshop een kant en klare WSL image gemaakt die je kan gebruiken om de workshop te volgen.
+
+Deze kan je hier downloaden: https://wslimage.blob.core.windows.net/image/wsl2-dev-image.7z
+
+Pak de image uit en importeer deze in WSL met het volgende commando:
+
+```powershell
+cd C:\Users\<jouw-gebruikersnaam>\Downloads\wsl2-dev-image
+wsl --import workshop-azure-app . .\wsl2-dev-image.tar
+```
+
+Open een terminal sessie in de workshop-azure-app WSL image.
+
+Clone de GitHub repository:
+
+````bash
+git -c http.sslVerify=false clone https://github.tooling.kpn.org/tooling-automation/az-apps-workshop.git
+cd az-apps-workshop
+````
+
+```bash
 ### Function App
 
 Eerst maken we een function app aan waarin we een HTTP trigger aanmaken die een fun fact teruggeeft.
@@ -15,11 +36,12 @@ Open een nieuwe terminal en ga naar de functionapp folder.
 
 Initialiseer een function app met de volgende commando's:
 ```bash
-cd functionapp
+cd ~/az-apps-workshop/functionapp
 func init --javascript 
 ```
 
-Maak een HTTP trigger aan met het volgende commando:
+Maak een HTTP trigger aan met de naam funfact met het volgende commando:
+
 ```bash
 func new --name funfact --template "HTTP trigger" --authlevel "anonymous"
 ```
@@ -29,7 +51,7 @@ Zorg ervoor dat de HTTP jouw favoriete funfact teruggeeft. Bijvoorbeeld:
 ```javascript
 return {
   jsonBody: {
-    funFact: "Did you know that the first computer virus was created in 1983?",
+    funfact: "Did you know that the first computer virus was created in 1983?",
   }
 }
 ```
@@ -52,23 +74,17 @@ Open een nieuwe terminal en ga naar de staticwebapp folder.
 Zorg dat je in de root van de staticwebapp folder zit en voer de volgende commando's uit:
 
 ```bash
-cd staticwebapp
-npm install -g @azure/static-web-apps-cli
+cd ~/az-apps-workshop/staticwebapp
 ```
 
-Validatie van de installatie:
-
-```bash
-swa --version
-```
-
-Zorg dat 
 Voor het lokaal draaien van de static web app geef je de URL van de function app mee.
 De SWA cli zal dan automatisch een proxy aanmaken zodat de static web app de function app kan aanroepen.
 
 ```bash
 swa start src --api-devserver-url http://localhost:7071
 ```
+
+Ga in je browser naar `http://localhost:4280` en je zou de static web app moeten zien.
 
 Klik op de knop "Get Fun Fact from Function App" en je zou de fun fact moeten zien.
 
@@ -81,7 +97,7 @@ Open een nieuwe terminal en ga naar de webapp folder.
 Run de web app lokaal:
 
 ```bash
-cd webapp
+cd ~/az-apps-workshop/webapp
 npm install
 node app.js
 ```
@@ -158,14 +174,17 @@ Nu gaan we het geheel deployen naar Azure.
 
 Definieer eerst een aantal environment variabelen zodat je deze kan hergebruiken.
 
+Open een nieuwe terminal en voer de volgende commando's uit:
+
 ```bash
 az login
 
-export RESOURCE_GROUP_NAME=rg-workshop-<jouw-ruisnaam>
-export STORAGE_NAME=stworkshop<jouw-ruisnaam>
-export FUNCTION_APP_NAME=fn-workshop-<jouw-ruisnaam>
-export STATIC_WEB_APP_NAME=swa-workshop-<jouw-ruisnaam>
-export WEB_APP_NAME=wa-workshop-<jouw-ruisnaam>
+export RUISNAAM=<jouw-ruisnaam>
+export RESOURCE_GROUP_NAME=rg-workshop-$RUISNAAM
+export STORAGE_NAME=stworkshop$RUISNAAM
+export FUNCTION_APP_NAME=fn-workshop-$RUISNAAM
+export STATIC_WEB_APP_NAME=swa-workshop-$RUISNAAM
+export WEB_APP_NAME=wa-workshop-$RUISNAAM
 ```
 
 Maak een nieuwe Resource Group aan:
@@ -206,19 +225,9 @@ Ga in je browser naar de url die je hebt opgehaald en verifieer dat de static we
 Deploy de static web app naar Azure:
 
 ```bash
-cd staticwebapp
+cd ~/az-apps-workshop/staticwebapp
 swa deploy ./src --env production --app-name $STATIC_WEB_APP_NAME
 ```
-
-Link de static web app aan de function app: https://learn.microsoft.com/en-us/azure/static-web-apps/functions-bring-your-own#link-an-existing-azure-functions-app
-
-Azure portal > Static Web App > APIs -> Link de Function app aan de Production environment
-
-Verifieer dat de static web app de function app aanroept door op de knop "Get Fun Fact from Function App" te klikken.
-
-Je zou nu het bericht "No fun fact found" moeten zien.
-
-We gaan eerst de function app deployen naar Azure.
 
 Maak de functie app in Azure aan:
 
@@ -229,16 +238,27 @@ az functionapp create --resource-group $RESOURCE_GROUP_NAME --consumption-plan-l
 Deploy de function app naar Azure:
 
 ```bash
-cd functionapp
+cd ~/az-apps-workshop/functionapp
 func azure functionapp publish $FUNCTION_APP_NAME
 ```
 
-Kopieer de URL die je krijgt als output van de publish commando en plak deze in je browser. Je zou dezelfde output moeten zien als wanneer je de function lokaal draait.
+Link de static web app aan de function app: https://learn.microsoft.com/en-us/azure/static-web-apps/functions-bring-your-own#link-an-existing-azure-functions-app
+
+Azure portal > Static Web App > APIs -> Link de Function app aan de Production environment
+
+Verifieer dat de static web app de function app aanroept door op de knop "Get Fun Fact from Function App" te klikken.
+
+Deploy de web app naar Azure met de volgende commando's:
+
+```bash
+cd ~/az-apps-workshop/webapp 
+az webapp up --sku F1 --name $WEB_APP_NAME --location westeurope --resource-group $RESOURCE_GROUP_NAME
+```
 
 Voeg de environment variable `FUNFACT_WEBAPP_API_URL` toe aan de function app, zodat de function app de web app kan aanroepen:
 
 ```bash
-az functionapp config appsettings set --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP_NAME --settings FUNFACT_WEBAPP_API_URL="https://$WEB_APP_NAME.azurewebsites.net"
+az functionapp config appsettings set --settings FUNFACT_WEBAPP_API_URL="https://$WEB_APP_NAME.azurewebsites.net" --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP_NAME 
 ```
 
 Herstart de function app:
@@ -247,10 +267,8 @@ Herstart de function app:
 az functionapp restart --name $FUNCTION_APP_NAME --resource-group $RESOURCE_GROUP_NAME
 ```
 
-Deploy de web app naar Azure met de volgende commando's:
+Verifieer dat de static web app de web app aanroept door op de knop "Get Fun Fact from Web App" te klikken.
 
-```bash
-cd webapp 
-az webapp up --sku F1 --name $WEB_APP_NAME --location westeurope --resource-group $RESOURCE_GROUP_NAME
-```
+Klaar! Je hebt nu een function app, static web app en web app gedeployed naar Azure.
+
 
