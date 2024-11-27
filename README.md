@@ -21,7 +21,7 @@ Open een terminal sessie in de workshop-azure-app WSL image.
 Clone de GitHub repository:
 
 ````bash
-git -c http.sslVerify=false clone https://github.tooling.kpn.org/tooling-automation/az-apps-workshop.git
+git clone git@github.com:tooling-automation/workshop-azure-apps.git
 cd az-apps-workshop
 ````
 
