@@ -173,10 +173,12 @@ Nu gaan we het geheel deployen naar Azure.
 
 Definieer eerst een aantal environment variabelen zodat je deze kan hergebruiken.
 
-Open een nieuwe terminal en voer de volgende commando's uit:
+Open een nieuwe terminal en voer de volgende commando's uit, kies bij het inloggen op Azure voor de kpn-business-market-workload-training subscription:
 
 ```bash
 azctx login
+
+azctx
 
 export RUISNAAM=<jouw-ruisnaam>
 export RESOURCE_GROUP_NAME=rg-workshop-$RUISNAAM
