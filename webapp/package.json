@@ -4,6 +4,6 @@
   "private": true,
   "main": "app.js",
   "dependencies": {
-    "express": "~4.16.1"
+    "express": "~4.21.1"
   }
 }
