@@ -25,7 +25,6 @@ git clone https://github.com/tooling-automation/workshop-azure-apps.git
 cd workshop-azure-apps
 ````
 
-```bash
 ### Function App
 
 Eerst maken we een function app aan waarin we een HTTP trigger aanmaken die een fun fact teruggeeft.
