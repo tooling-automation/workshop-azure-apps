@@ -16,14 +16,24 @@ cd %USERPROFILE%\Downloads\wsl2-dev-image
 wsl --import workshop-azure-app . .\wsl2-dev-image.tar
 ```
 
-Open een terminal sessie in de workshop-azure-app WSL image.
+Open Windows Terminal en open een nieuwe shell in de workshop-azure-app WSL image.
 
 Clone de GitHub repository:
 
 ````bash
 git clone https://github.com/tooling-automation/workshop-azure-apps.git
-cd workshop-azure-apps
+cd ~/workshop-azure-apps
 ````
+
+Open VS Code in de root van de workshop-azure-apps folder:
+
+```bash
+code .
+```
+
+Bekijk en lees de bestanden in de workshop-azure-apps folder.
+
+Probeer te begrijpen wat er gebeurt in de verschillende bestanden en folders.
 
 ### Function App
 
@@ -48,15 +58,27 @@ func new --name funfact --template "HTTP trigger" --authlevel "anonymous"
 Zorg ervoor dat de HTTP jouw favoriete funfact teruggeeft. Bijvoorbeeld:
 
 ```javascript
-return {
-  jsonBody: {
-    funfact: "Did you know that the first computer virus was created in 1983?",
+// functionapp/src/functions/funfact.js
+const { app } = require('@azure/functions');
+
+app.http('funfact', {
+  methods: ['GET', 'POST'],
+  authLevel: 'anonymous',
+  handler: async (request, context) => {
+    context.log(`Http function processed request for url "${request.url}"`);
+
+    return {
+      jsonBody: {
+        funfact: "Did you know that the first computer virus was created in 1983?",
+      }
+    }
   }
-}
+});
 ```
 
 Draai de function app met het volgende commando:
 ```bash
+cd ~/workshop-azure-apps/functionapp
 func start
 ```
 
@@ -105,6 +127,10 @@ Ga in je browser naar `http://localhost:3000/api/funfact` en je zou een nieuwe f
 
 Ga naar je function app en open het bestand local.settings.json. Voeg de volgende key-value pair toe:
 
+```bash
+cd ~/workshop-azure-apps/functionapp
+```
+
 ```json
 {
   "IsEncrypted": false,
@@ -120,6 +146,7 @@ Ga naar je function app en open het bestand local.settings.json. Voeg de volgend
 Maak nu een nieuwe http trigger aan in de function app die de web app aanroept:
 
 ```bash
+cd ~/workshop-azure-apps/functionapp
 func new --name funfactwa --template "HTTP trigger" --authlevel "anonymous"
 ```
 
